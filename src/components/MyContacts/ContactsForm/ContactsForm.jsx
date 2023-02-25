@@ -1,34 +1,35 @@
-import { Component } from "react";
+import { useState } from "react";
 import css from './ContactsForm.module.css';
 import PropTypes from 'prop-types';
 
-class ContactsForm extends Component {
-    state = {
-        name: '',
-        number: '',
-    };
+const ContactsForm = ({onFormSubmit}) => {
+    const [name, setName] = useState('');
+    const [number, setNumber] = useState('');
 
-    handleSubmit = e => {
+    const handleSubmit = e => {
         e.preventDefault();
-        const { onSubmit } = this.props;
-        const result = onSubmit({ ...this.state });
-        if (result) {
-            this.reset();
+        onFormSubmit({ name, number });
+        reset();
+    };
+
+    const reset = () => {
+        setName('');
+        setNumber('');
+    };
+
+    const handleChange = e => {
+        const { name, value } = e.target;
+        switch (name) {
+            case 'name':
+                setName(value);
+                break;
+            case 'number':
+                setNumber(value);
+                break;
+            default:
+                return;
         }
-    };
-
-    reset() {
-        this.setState({ name: '', number: '' });
-    };
-
-    handleChange = ({ target }) => {
-        const { name, value } = target;
-        this.setState({ [name]: value, });
     }
-
-    render() {
-        const { handleChange, handleSubmit } = this;
-        const { name, number } = this.state;
 
         return (
             <form className={css.form} onSubmit={handleSubmit}>
@@ -63,7 +64,7 @@ class ContactsForm extends Component {
                 </div>
             </form>
         );
-    }
+    
 };
 
 export default ContactsForm;
