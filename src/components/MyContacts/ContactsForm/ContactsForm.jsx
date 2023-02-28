@@ -2,13 +2,14 @@ import { useState } from "react";
 import css from './ContactsForm.module.css';
 import PropTypes from 'prop-types';
 
-const ContactsForm = ({onFormSubmit}) => {
+const ContactsForm = ({onSubmit}) => {
     const [name, setName] = useState('');
     const [number, setNumber] = useState('');
 
     const handleSubmit = e => {
         e.preventDefault();
-        onFormSubmit({ name, number });
+        
+        onSubmit({ name, number });
         reset();
     };
 
@@ -18,13 +19,13 @@ const ContactsForm = ({onFormSubmit}) => {
     };
 
     const handleChange = e => {
-        const { name, value } = e.target;
-        switch (name) {
+        // const { name, value } = e.target;
+        switch (e.target.name) {
             case 'name':
-                setName(value);
+                setName(e.target.value);
                 break;
             case 'number':
-                setNumber(value);
+                setNumber(e.target.value);
                 break;
             default:
                 return;

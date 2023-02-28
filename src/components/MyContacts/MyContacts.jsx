@@ -1,72 +1,48 @@
-import { Component } from "react";
+import { useState, useEffect } from "react";
 import { nanoid } from 'nanoid';
 import css from './MyContacts.module.css';
 import ContactsForm from "./ContactsForm/ContactsForm";
 import ContactsSearch from "./ContactsSearch/ContactsSearch";
 import ContactsList from "./ContactsList/ContactsList";
 
-class MyContacts extends Component {
-    state = {
-        contacts: [],
-        filter: '',
-    };
+const MyContacts = () => {
+    const [contacts, setContacts] = useState(() => {
+        return JSON.parse(window.localStorage.getItem('contacts')) ?? [];
+    });
+    const [filter, setFilter] = useState('');
 
-    componentDidUpdate(prevProps, prevState) {
-        const { contacts } = this.state;
-        if (contacts !== prevState.contacts) {
-            localStorage.setItem('contacts', JSON.stringify(contacts));
-        }
-    };
+    useEffect(() => {
+        window.localStorage.setItem('contacts', JSON.stringify(contacts))
+    }, [contacts]);
 
-    componentDidMount() {
-        const contacts = localStorage.getItem('contacts');
-        const parsedContacts = JSON.parse(contacts);
-
-        if (parsedContacts) {
-            this.setState({ contacts: parsedContacts });
-        }
-    };
-
-    addContact = ({ name, number }) => {
-        if (this.isDublicate(name)) {
+    const addContact = ({ name, number }) => {
+        if (isDublicate(name)) {
             alert(`${name} is already in contacts.`);
-            this.reset();
-            
-            return
+            return;
         }
 
-        this.setState(prevState => {
-            const { contacts } = prevState;
-
+        setContacts(prevContacts => {
             const newContact = {
                 id: nanoid(),
                 name,
                 number,
             };
-            return { contacts: [newContact, ...contacts] };
+            return { newContact, ...prevContacts };
         });
-        return true;
+        return;
     };
 
-    reset = () => {
-        this.setState({ name: '' });
-    }
-
-    isDublicate(name) {
+    const isDublicate = (name)=> {
         const normalizedName = name.toLowerCase();
-        const { contacts } = this.state;
-        const result = contacts.find(({ name }) => {
+        const result = contacts.find(({name}) => {
             return name.toLocaleLowerCase() === normalizedName;
         });
         return Boolean(result);
     };
 
-    handleSearch = ({ target }) => {
-        this.setState({ filter: target.value });
-    };
+    const handleSearch = e => setFilter(e.target.value);
 
-    getFilteredContacts() {
-        const { filter, contacts } = this.state;
+    const getFilteredContacts = () => {
         if  (!filter ) {
             return contacts;
         }
@@ -78,18 +54,13 @@ class MyContacts extends Component {
         return result;
     };
 
-    removeContact = id => {
-        this.setState(({ contacts }) => {
-            const newContacts = contacts.filter(contact => contact.id !== id);
-            return { contacts: newContacts };
-        });
+    const removeContact = id => {
+        setContacts(prevContacts => prevContacts.filter(contact => contact.id !== id)
+        );
     };
 
-
-    render() {
-        const { addContact, handleSearch, removeContact } = this;
-        const peoples = this.getFilteredContacts();
-        const isContacts = peoples.length !== 0;
+        const peoples = getFilteredContacts();
+        const isContacts = peoples.length;
 
         return (
             <div className={css.wrapper}>
@@ -106,7 +77,7 @@ class MyContacts extends Component {
                 </div>
             </div>
         );
-    }
+    
 };
 
 export default MyContacts;
