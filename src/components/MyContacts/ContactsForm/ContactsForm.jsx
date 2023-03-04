@@ -9,7 +9,7 @@ const ContactsForm = ({onSubmit}) => {
     const handleSubmit = e => {
         e.preventDefault();
         
-        onSubmit({ name, number });
+        onSubmit({ name, number } );
         reset();
     };
 

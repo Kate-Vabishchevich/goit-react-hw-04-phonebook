@@ -27,7 +27,7 @@ const MyContacts = () => {
                 name,
                 number,
             };
-            return { newContact, ...prevContacts };
+            return [newContact, ...prevContacts] ;
         });
         return;
     };
@@ -60,8 +60,8 @@ const MyContacts = () => {
     };
 
         const peoples = getFilteredContacts();
-        const isContacts = peoples.length;
-
+    const isContacts = Boolean(peoples.length);
+    
         return (
             <div className={css.wrapper}>
                 <div className={css.block}>
