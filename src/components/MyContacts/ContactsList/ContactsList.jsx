@@ -16,7 +16,7 @@ const ContactsList = ({ removeContact, contacts }) => {
     </li>
   ));
 
-  return <ol className={ css.list}>{items}</ol>;
+  return <ol className={css.list}>{items}</ol>;
 };
 
 export default ContactsList;
@@ -31,4 +31,3 @@ ContactsList.propTypes = {
     })
   ),
 };
-

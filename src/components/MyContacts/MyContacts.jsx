@@ -1,83 +1,97 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import css from './MyContacts.module.css';
-import ContactsForm from "./ContactsForm/ContactsForm";
-import ContactsSearch from "./ContactsSearch/ContactsSearch";
-import ContactsList from "./ContactsList/ContactsList";
+import ContactsForm from './ContactsForm/ContactsForm';
+import ContactsSearch from './ContactsSearch/ContactsSearch';
+import ContactsList from './ContactsList/ContactsList';
 
 const MyContacts = () => {
-    const [contacts, setContacts] = useState(() => {
-        return JSON.parse(window.localStorage.getItem('contacts')) ?? [];
+  const [contacts, setContacts] = useState(() => {
+    return JSON.parse(localStorage.getItem('contacts')) ?? [];
+  });
+  const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  // const addContact = ({ name, number }) => {
+  //   if (isDublicate(name)) {
+  //     alert(`${name} is already in contacts.`);
+  //     return false;
+  //   }
+
+  //   setContacts(prevContacts => {
+  //     const newContact = {
+  //       id: nanoid(),
+  //       name,
+  //       number,
+  //     };
+  //     return [newContact, ...prevContacts];
+  //   });
+  //   return true;
+  // };
+
+  const addContact = ({ name, number }) => {
+    if (
+      contacts.find(
+        contact => contact.name.toLocaleLowerCase() === name.toLocaleLowerCase()
+      )
+    ) {
+      alert(`${name} is already in contacts.`);
+    }
+    setContacts(prevContacts => {
+      return [{ id: nanoid(), name, number }, ...prevContacts];
     });
-    const [filter, setFilter] = useState('');
+  };
 
-    useEffect(() => {
-        window.localStorage.setItem('contacts', JSON.stringify(contacts))
-    }, [contacts]);
+  // const isDublicate = name => {
+  //   const normalizedName = name.toLowerCase();
+  //   const result = contacts.find(({ name }) => {
+  //     return name.toLocaleLowerCase() === normalizedName;
+  //   });
+  //   return Boolean(result);
+  // };
 
-    const addContact = ({ name, number }) => {
-        if (isDublicate(name)) {
-            alert(`${name} is already in contacts.`);
-            return;
-        }
+  const handleSearch = ({ target }) => setFilter(target.value);
 
-        setContacts(prevContacts => {
-            const newContact = {
-                id: nanoid(),
-                name,
-                number,
-            };
-            return [newContact, ...prevContacts] ;
-        });
-        return;
-    };
+  const getFilteredContacts = () => {
+    if (!filter) {
+      return contacts;
+    }
 
-    const isDublicate = (name)=> {
-        const normalizedName = name.toLowerCase();
-        const result = contacts.find(({name}) => {
-            return name.toLocaleLowerCase() === normalizedName;
-        });
-        return Boolean(result);
-    };
+    const normalizedSearch = filter.toLowerCase();
+    const result = contacts.filter(({ name }) => {
+      return name.toLocaleLowerCase().includes(normalizedSearch);
+    });
+    return result;
+  };
 
-    const handleSearch = e => setFilter(e.target.value);
+  const removeContact = id => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== id)
+    );
+  };
 
-    const getFilteredContacts = () => {
-        if  (!filter ) {
-            return contacts;
-        }
+  const peoples = getFilteredContacts();
+  const isContacts = Boolean(peoples.length);
 
-        const normalizedSearch = filter.toLowerCase();
-        const result = contacts.filter(({ name }) => {
-            return name.toLocaleLowerCase().includes(normalizedSearch)
-        });
-        return result;
-    };
-
-    const removeContact = id => {
-        setContacts(prevContacts => prevContacts.filter(contact => contact.id !== id)
-        );
-    };
-
-        const peoples = getFilteredContacts();
-    const isContacts = Boolean(peoples.length);
-    
-        return (
-            <div className={css.wrapper}>
-                <div className={css.block}>
-                    <h2 className={css.title}>Phonebook</h2>
-                    <ContactsForm onSubmit={addContact} />
-                </div>
-                <div className={css.block}>
-                    <h2 className={css.title}>Contacts</h2>
-                    <ContactsSearch handleChange={handleSearch} />
-                    {isContacts && (<ContactsList removeContact={removeContact} contacts={peoples} />)}
-                    {!isContacts && <p>No contacts in the list</p>}
-                    
-                </div>
-            </div>
-        );
-    
+  return (
+    <div className={css.wrapper}>
+      <div className={css.block}>
+        <h2 className={css.title}>Phonebook</h2>
+        <ContactsForm onSubmit={addContact} />
+      </div>
+      <div className={css.block}>
+        <h2 className={css.title}>Contacts</h2>
+        <ContactsSearch handleChange={handleSearch} />
+        {isContacts && (
+          <ContactsList removeContact={removeContact} contacts={peoples} />
+        )}
+        {!isContacts && <p>No contacts in the list</p>}
+      </div>
+    </div>
+  );
 };
 
 export default MyContacts;
