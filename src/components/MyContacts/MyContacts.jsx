@@ -5,9 +5,16 @@ import ContactsForm from './ContactsForm/ContactsForm';
 import ContactsSearch from './ContactsSearch/ContactsSearch';
 import ContactsList from './ContactsList/ContactsList';
 
+const initial = [
+  { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+  { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+  { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+  { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+];
+
 const MyContacts = () => {
   const [contacts, setContacts] = useState(() => {
-    return JSON.parse(localStorage.getItem('contacts')) ?? [];
+    return JSON.parse(localStorage.getItem('contacts')) ?? initial;
   });
   const [filter, setFilter] = useState('');
 
@@ -15,43 +22,18 @@ const MyContacts = () => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
-  // const addContact = ({ name, number }) => {
-  //   if (isDublicate(name)) {
-  //     alert(`${name} is already in contacts.`);
-  //     return false;
-  //   }
-
-  //   setContacts(prevContacts => {
-  //     const newContact = {
-  //       id: nanoid(),
-  //       name,
-  //       number,
-  //     };
-  //     return [newContact, ...prevContacts];
-  //   });
-  //   return true;
-  // };
-
   const addContact = ({ name, number }) => {
     if (
       contacts.find(
         contact => contact.name.toLocaleLowerCase() === name.toLocaleLowerCase()
       )
     ) {
-      alert(`${name} is already in contacts.`);
+      return alert(`${name} is already in contacts.`);
     }
     setContacts(prevContacts => {
       return [{ id: nanoid(), name, number }, ...prevContacts];
     });
   };
-
-  // const isDublicate = name => {
-  //   const normalizedName = name.toLowerCase();
-  //   const result = contacts.find(({ name }) => {
-  //     return name.toLocaleLowerCase() === normalizedName;
-  //   });
-  //   return Boolean(result);
-  // };
 
   const handleSearch = ({ target }) => setFilter(target.value);
 
